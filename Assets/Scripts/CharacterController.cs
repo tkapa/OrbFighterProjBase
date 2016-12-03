@@ -6,6 +6,7 @@ public class CharacterController : MonoBehaviour {
     //Anchorpoint of character
     public GameObject anchorPoint;
     public GameObject projectilePoint;
+    GameObject otherPlayer;
 
     //Changeable variables that manage movement
     [System.Serializable]
@@ -15,6 +16,7 @@ public class CharacterController : MonoBehaviour {
         public float moveSpeed = 5.0f;
         public float gravity = 9.8f;
         public float jumpVelocity = 10.0f;
+        public float dashSpeed = 1.0f;
         public LayerMask ground;
     }
 
@@ -26,6 +28,7 @@ public class CharacterController : MonoBehaviour {
         public string HORIZONTAL_INPUT = "Horizontal";
         public string VERTICAL_INPUT = "Vertical";
         public string PROJECTILE_INPUT = "e";
+        public string DASH_INPUT = "q";
     }
 
     //Changeable variables that manage combat
@@ -36,8 +39,12 @@ public class CharacterController : MonoBehaviour {
         public bool isStunned = false;
         public float stunTime = 0.75f;
 
+        //Character Projectile times
         public GameObject projectile;
         public float projectileResetTime = 1.0f;
+
+        //Character dashing variables
+        public float dashTime = 0.75f;
     }
 
     //Public variable classes initialisation
@@ -48,15 +55,15 @@ public class CharacterController : MonoBehaviour {
     //Input Temp Variables
     private float horizontalInput = 0.0f;
     private float verticalInput = 0.0f;
-
+    private bool dashInput = false;
     private bool attackInput = false;
     private bool canAttack = true;
+    private bool canDash = true;
 
     private float distToGround = 0.1f;
     private float stunTimer = 0.0f;
-
-    [SerializeField]
     private float projectileResetTimer = 0.0f;
+    private float dashTimer = 0.0f;
 
     //This object's rigidbody
     Rigidbody rigidBody;
@@ -68,6 +75,8 @@ public class CharacterController : MonoBehaviour {
             rigidBody = GetComponent<Rigidbody>();
         else
             Debug.LogError("This object does not contain a RigidBody!");
+
+        otherPlayer = GameObject.FindGameObjectWithTag("Character");
 	}
 	
 	// Update is called once per frame
@@ -75,6 +84,12 @@ public class CharacterController : MonoBehaviour {
         //Retrieve input
         getInput();
 
+        if (otherPlayer.transform.position.x > transform.position.x)
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+        else
+            transform.rotation = Quaternion.Euler(0, 180, 0);
+        
+        //Update projectile throwing function
         if (canAttack && !combatSettings.isStunned)
             throwProjectile();
         else if (projectileResetTimer <= combatSettings.projectileResetTime)
@@ -111,6 +126,7 @@ public class CharacterController : MonoBehaviour {
 
         //Take combat input here
         attackInput = Input.GetKeyDown(inputSettings.PROJECTILE_INPUT);
+        dashInput = Input.GetKeyDown(inputSettings.DASH_INPUT);
     }
 
     void movement()
@@ -119,7 +135,7 @@ public class CharacterController : MonoBehaviour {
             rigidBody.AddForce(Vector3.up * moveSettings.jumpVelocity);
 
         //Move the Object's X position here
-        rigidBody.MovePosition(transform.position + (transform.right * (horizontalInput * moveSettings.moveSpeed * Time.deltaTime)));
+        rigidBody.MovePosition(transform.position + (Camera.main.transform.right * (horizontalInput * moveSettings.moveSpeed * Time.deltaTime)));
     }
 
     void throwProjectile()
