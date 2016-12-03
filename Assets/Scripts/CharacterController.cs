@@ -6,6 +6,7 @@ public class CharacterController : MonoBehaviour {
     //Anchorpoint of character
     public GameObject anchorPoint;
 
+    //Changeable variables that manage movement
     [System.Serializable]
     public class MoveMentSettings
     {
@@ -14,13 +15,9 @@ public class CharacterController : MonoBehaviour {
         public float gravity = 9.8f;
         public float jumpVelocity = 10.0f;
         public LayerMask ground;
-
-        //Character stun variables
-        public bool isStunned = false;
-        public float stunTime = 0.75f;
-        public float stunTimer = 0.0f;
     }
 
+    //Changeable variales that manage what inputs to use
     [System.Serializable]
     public class InputSettings
     {
@@ -30,16 +27,34 @@ public class CharacterController : MonoBehaviour {
         public string PROJECTILE_INPUT = "e";
     }
 
+    //Changeable variables that manage combat
+    [System.Serializable]
+    public class CombatSettings
+    {
+        //Character stun variables
+        public bool isStunned = false;
+        public float stunTime = 0.75f;
+
+        public GameObject projectile;
+        public float projectileResetTime = 1.0f;
+    }
+
     //Public variable classes initialisation
     public MoveMentSettings moveSettings = new MoveMentSettings();
     public InputSettings inputSettings = new InputSettings();
+    public CombatSettings combatSettings = new CombatSettings();
 
     //Input Temp Variables
     private float horizontalInput = 0.0f;
     private float verticalInput = 0.0f;
 
+    private bool attackInput = false;
+    private bool canAttack = true;
+
     private float distToGround = 0.1f;
-    
+    private float stunTimer = 0.0f;
+    private float projectileResetTimer = 0.0f;
+
     //This object's rigidbody
     Rigidbody rigidBody;
 
@@ -62,14 +77,26 @@ public class CharacterController : MonoBehaviour {
     {
         //Execute movement based on input
         //If player is not stunned, allow movement otherwise, increment timer and reset the variables
-        if (!moveSettings.isStunned)
+        if (!combatSettings.isStunned)
             movement();
-        else if (moveSettings.stunTimer <= moveSettings.stunTime)
-            moveSettings.stunTimer += Time.deltaTime;
+        else if (stunTimer <= combatSettings.stunTime)
+            stunTimer += Time.deltaTime;
         else {
-            moveSettings.stunTimer = 0.0f;
-            moveSettings.isStunned = false;
+            stunTimer = 0.0f;
+            combatSettings.isStunned = false;
         }
+
+        //Ensure that the player can only throw out projectiles if they are able to and the reset timer is at zero
+        if (projectileResetTimer == 0.0f)
+            throwProjectile();
+        else if (projectileResetTimer <= combatSettings.projectileResetTime)
+            projectileResetTimer += Time.deltaTime;
+        else
+            projectileResetTimer = 0.0f;
+
+        //Reset canAttack is the player has lifted the attack key reset bool to true
+        if (Input.GetKeyUp(inputSettings.PROJECTILE_INPUT))
+            canAttack = true;
     }
 
     void getInput()
@@ -81,6 +108,9 @@ public class CharacterController : MonoBehaviour {
             horizontalInput = Input.GetAxis(inputSettings.HORIZONTAL_INPUT);
 
         verticalInput = Input.GetAxisRaw(inputSettings.VERTICAL_INPUT);
+
+        //Take combat input here
+        attackInput = Input.GetKeyDown(inputSettings.PROJECTILE_INPUT);
     }
 
     void movement()
@@ -90,6 +120,16 @@ public class CharacterController : MonoBehaviour {
 
         //Move the Object's X position here
         rigidBody.MovePosition(transform.position + (transform.right * (horizontalInput * moveSettings.moveSpeed * Time.deltaTime)));
+    }
+
+    void throwProjectile()
+    {
+        //On attack input, instantiate the projectile
+        if (attackInput && canAttack)
+        {
+            Instantiate(combatSettings.projectile);
+            canAttack = false;
+        }
     }
 
     bool grounded()

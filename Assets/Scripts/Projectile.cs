@@ -4,12 +4,12 @@ using System.Collections;
 public class Projectile : MonoBehaviour {
 
     [System.Serializable]
-    public class movementVariables {
+    public class ProjectileVariables {
         //Set up variables for projectile movement
         public float moveSpeed = 5.0f;
     }
 
-    public movementVariables moveVars = new movementVariables();
+    public ProjectileVariables projVars = new ProjectileVariables();
 
 
 	// Use this for initialization
@@ -18,15 +18,21 @@ public class Projectile : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
-	}
+	void FixedUpdate () {
+        movement();
+    }
+
+    void movement()
+    {
+        //Move the projectile's positiion
+        transform.position += transform.up * projVars.moveSpeed * Time.deltaTime;
+    }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Character")
         {
-            other.GetComponent<CharacterController>().moveSettings.isStunned = true;
+            other.GetComponent<CharacterController>().combatSettings.isStunned = true;
             Destroy(this.gameObject);
         }
         else
