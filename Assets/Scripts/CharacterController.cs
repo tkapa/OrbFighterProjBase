@@ -5,6 +5,7 @@ public class CharacterController : MonoBehaviour {
 
     //Anchorpoint of character
     public GameObject anchorPoint;
+    public GameObject projectilePoint;
 
     //Changeable variables that manage movement
     [System.Serializable]
@@ -53,6 +54,8 @@ public class CharacterController : MonoBehaviour {
 
     private float distToGround = 0.1f;
     private float stunTimer = 0.0f;
+
+    [SerializeField]
     private float projectileResetTimer = 0.0f;
 
     //This object's rigidbody
@@ -71,7 +74,16 @@ public class CharacterController : MonoBehaviour {
 	void Update () {
         //Retrieve input
         getInput();
-	}
+
+        if (canAttack && !combatSettings.isStunned)
+            throwProjectile();
+        else if (projectileResetTimer <= combatSettings.projectileResetTime)
+            projectileResetTimer += Time.deltaTime;
+        else {
+            projectileResetTimer = 0.0f;
+            canAttack = true;
+        }
+    }
 
     void FixedUpdate()
     {
@@ -85,18 +97,6 @@ public class CharacterController : MonoBehaviour {
             stunTimer = 0.0f;
             combatSettings.isStunned = false;
         }
-
-        //Ensure that the player can only throw out projectiles if they are able to and the reset timer is at zero
-        if (projectileResetTimer == 0.0f)
-            throwProjectile();
-        else if (projectileResetTimer <= combatSettings.projectileResetTime)
-            projectileResetTimer += Time.deltaTime;
-        else
-            projectileResetTimer = 0.0f;
-
-        //Reset canAttack is the player has lifted the attack key reset bool to true
-        if (Input.GetKeyUp(inputSettings.PROJECTILE_INPUT))
-            canAttack = true;
     }
 
     void getInput()
@@ -125,9 +125,9 @@ public class CharacterController : MonoBehaviour {
     void throwProjectile()
     {
         //On attack input, instantiate the projectile
-        if (attackInput && canAttack)
+        if (attackInput)
         {
-            Instantiate(combatSettings.projectile);
+            Instantiate(combatSettings.projectile, projectilePoint.transform.position, projectilePoint.transform.rotation);
             canAttack = false;
         }
     }
