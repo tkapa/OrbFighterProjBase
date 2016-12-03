@@ -41,6 +41,7 @@ public class CharacterController : MonoBehaviour {
 
         //Character Projectile times
         public GameObject projectile;
+        public float projectileSpeed = 6.0f;
         public float projectileResetTime = 1.0f;
 
         //Character dashing variables
@@ -59,6 +60,8 @@ public class CharacterController : MonoBehaviour {
     private bool attackInput = false;
     private bool canAttack = true;
     private bool canDash = true;
+
+    private bool facingRight;
 
     private float distToGround = 0.1f;
     private float stunTimer = 0.0f;
@@ -85,9 +88,15 @@ public class CharacterController : MonoBehaviour {
         getInput();
 
         if (otherPlayer.transform.position.x > transform.position.x)
+        {
+            facingRight = true;
             transform.rotation = Quaternion.Euler(0, 0, 0);
+        }
         else
+        {
+            facingRight = false;
             transform.rotation = Quaternion.Euler(0, 180, 0);
+        }
         
         //Update projectile throwing function
         if (canAttack && !combatSettings.isStunned)
@@ -143,7 +152,12 @@ public class CharacterController : MonoBehaviour {
         //On attack input, instantiate the projectile
         if (attackInput)
         {
-            Instantiate(combatSettings.projectile, projectilePoint.transform.position, projectilePoint.transform.rotation);
+            GameObject thisProj = Instantiate(combatSettings.projectile, projectilePoint.transform.position, projectilePoint.transform.rotation) as GameObject;
+
+            if (!facingRight)
+                thisProj.GetComponent<Projectile>().projVars.moveSpeed *= -combatSettings.projectileSpeed;
+            else
+                thisProj.GetComponent<Projectile>().projVars.moveSpeed *= combatSettings.projectileSpeed;
             canAttack = false;
         }
     }

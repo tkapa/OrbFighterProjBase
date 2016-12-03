@@ -6,7 +6,7 @@ public class Projectile : MonoBehaviour {
     [System.Serializable]
     public class ProjectileVariables {
         //Set up variables for projectile movement
-        public float moveSpeed = 5.0f;
+        public float moveSpeed = 1.0f;
     }
 
     public ProjectileVariables projVars = new ProjectileVariables();
@@ -25,7 +25,7 @@ public class Projectile : MonoBehaviour {
     void movement()
     {
         //Move the projectile's positiion
-        transform.position += transform.up * projVars.moveSpeed * Time.deltaTime;
+        transform.position += Camera.main.transform.right * projVars.moveSpeed * Time.deltaTime;
     }
 
     void OnTriggerEnter(Collider other)
