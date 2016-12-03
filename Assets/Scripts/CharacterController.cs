@@ -14,16 +14,23 @@ public class CharacterController : MonoBehaviour {
         public float gravity = 9.8f;
         public float jumpVelocity = 10.0f;
         public LayerMask ground;
+
+        //Character stun variables
+        public bool isStunned = false;
+        public float stunTime = 0.75f;
+        public float stunTimer = 0.0f;
     }
 
     [System.Serializable]
     public class InputSettings
     {
-        //Variables that take input from the player
+        //Variables that take axis input from the player
         public string HORIZONTAL_INPUT = "Horizontal";
         public string VERTICAL_INPUT = "Vertical";
+        public string PROJECTILE_INPUT = "e";
     }
 
+    //Public variable classes initialisation
     public MoveMentSettings moveSettings = new MoveMentSettings();
     public InputSettings inputSettings = new InputSettings();
 
@@ -31,11 +38,9 @@ public class CharacterController : MonoBehaviour {
     private float horizontalInput = 0.0f;
     private float verticalInput = 0.0f;
 
-
-    private float Yvelocity = 0.0f;
-    private float Ydisplacement = 0.0f;
     private float distToGround = 0.1f;
     
+    //This object's rigidbody
     Rigidbody rigidBody;
 
 	// Use this for initialization
@@ -56,7 +61,15 @@ public class CharacterController : MonoBehaviour {
     void FixedUpdate()
     {
         //Execute movement based on input
-        movement();
+        //If player is not stunned, allow movement otherwise, increment timer and reset the variables
+        if (!moveSettings.isStunned)
+            movement();
+        else if (moveSettings.stunTimer <= moveSettings.stunTime)
+            moveSettings.stunTimer += Time.deltaTime;
+        else {
+            moveSettings.stunTimer = 0.0f;
+            moveSettings.isStunned = false;
+        }
     }
 
     void getInput()
