@@ -4,9 +4,9 @@ using System.Collections;
 public class CharacterController : MonoBehaviour {
 
     //Anchorpoint of character
-    public GameObject anchorPoint;
-    public GameObject projectilePoint;
-    public GameObject otherPlayer;
+    public GameObject anchorPoint, 
+        otherPlayer, 
+        projectilePoint;
 
     //Changeable variables that manage movement
     [System.Serializable]
@@ -46,18 +46,25 @@ public class CharacterController : MonoBehaviour {
 
         //Character dashing variables
         public float dashTime = 0.75f;
+
+        //Health and Super Values
+        public float maxHealth = 100.0f;
+        public float currHealth;
+
+        public float maxSuper = 100.0f;
+        public float currSuper;
     }
 
     [System.Serializable]
     public class audioClips
     {
         //Audioclips for *Insert verb here*
-        public AudioClip jumped;
-        public AudioClip projectiled;
-        public AudioClip dashed;
-        public AudioClip damaged;
-        public AudioClip landed;
-        public AudioClip super;
+        public AudioClip jumped, 
+            projectiled, 
+            dashed, 
+            damaged, 
+            landed, 
+            super;
     }
 
     //Public variable classes initialisation
@@ -66,25 +73,22 @@ public class CharacterController : MonoBehaviour {
     public CombatSettings combatSettings = new CombatSettings();
     public audioClips audioClip = new audioClips();
 
-    //Input Temp Variables
-    private float horizontalInput = 0.0f;
-    private float verticalInput = 0.0f;
-    private bool dashInput = false;
-    private bool attackInput = false;
+    //Bools that govern input and action
+    private bool dashInput, 
+        attackInput, 
+        facingRight, 
+        canDash, 
+        canAttack;
 
-    //Bools that manage whether or not the player may perform certain actions
-    private bool canAttack = true;
-    private bool canDash = true;
-
-    //Determine player facing
-    private bool facingRight;
-
-    //Miscellaneous variables that are used for timers and bool calculations. These shouldn't be touched
     private float distToGround = 0.1f;
-    private float stunTimer = 0.0f;
-    private float projectileResetTimer = 0.0f;
-    private float dashTimer = 0.0f;
 
+    //Timer and input temporary variables
+    private float stunTimer, 
+        dashTimer, 
+        projectileResetTimer, 
+        verticalInput, 
+        horizontalInput;
+    
     //This object's rigidbody
     Rigidbody rigidBody;
 
@@ -98,6 +102,13 @@ public class CharacterController : MonoBehaviour {
 
         //Find other player
         otherPlayer = GameObject.FindGameObjectWithTag("Character");
+
+        //Initialise Variables
+        canDash = canAttack = true;
+        dashInput = attackInput = facingRight = false;
+        stunTimer = dashTimer = projectileResetTimer = horizontalInput = verticalInput = 0.0f;
+        combatSettings.currHealth = combatSettings.maxHealth;
+        combatSettings.currSuper = 0.0f;
 	}
 	
 	// Update is called once per frame
