@@ -6,7 +6,7 @@ public class CharacterController : MonoBehaviour {
     //Anchorpoint of character
     public GameObject anchorPoint;
     public GameObject projectilePoint;
-    GameObject otherPlayer;
+    public GameObject otherPlayer;
 
     //Changeable variables that manage movement
     [System.Serializable]
@@ -48,21 +48,38 @@ public class CharacterController : MonoBehaviour {
         public float dashTime = 0.75f;
     }
 
+    [System.Serializable]
+    public class audioClips
+    {
+        //Audioclips for *Insert verb here*
+        public AudioClip jumped;
+        public AudioClip projectiled;
+        public AudioClip dashed;
+        public AudioClip damaged;
+        public AudioClip landed;
+        public AudioClip super;
+    }
+
     //Public variable classes initialisation
     public MoveMentSettings moveSettings = new MoveMentSettings();
     public InputSettings inputSettings = new InputSettings();
     public CombatSettings combatSettings = new CombatSettings();
+    public audioClips audioClip = new audioClips();
 
     //Input Temp Variables
     private float horizontalInput = 0.0f;
     private float verticalInput = 0.0f;
     private bool dashInput = false;
     private bool attackInput = false;
+
+    //Bools that manage whether or not the player may perform certain actions
     private bool canAttack = true;
     private bool canDash = true;
 
+    //Determine player facing
     private bool facingRight;
 
+    //Miscellaneous variables that are used for timers and bool calculations. These shouldn't be touched
     private float distToGround = 0.1f;
     private float stunTimer = 0.0f;
     private float projectileResetTimer = 0.0f;
@@ -79,6 +96,7 @@ public class CharacterController : MonoBehaviour {
         else
             Debug.LogError("This object does not contain a RigidBody!");
 
+        //Find other player
         otherPlayer = GameObject.FindGameObjectWithTag("Character");
 	}
 	
@@ -87,6 +105,7 @@ public class CharacterController : MonoBehaviour {
         //Retrieve input
         getInput();
 
+        //Determine which way this object should be facing
         if (otherPlayer.transform.position.x > transform.position.x)
         {
             facingRight = true;
@@ -97,16 +116,12 @@ public class CharacterController : MonoBehaviour {
             facingRight = false;
             transform.rotation = Quaternion.Euler(0, 180, 0);
         }
-        
+
         //Update projectile throwing function
         if (canAttack && !combatSettings.isStunned)
             throwProjectile();
-        else if (projectileResetTimer <= combatSettings.projectileResetTime)
-            projectileResetTimer += Time.deltaTime;
-        else {
-            projectileResetTimer = 0.0f;
-            canAttack = true;
-        }
+        else
+            projectileRundownTimer();
     }
 
     void FixedUpdate()
@@ -115,17 +130,14 @@ public class CharacterController : MonoBehaviour {
         //If player is not stunned, allow movement otherwise, increment timer and reset the variables
         if (!combatSettings.isStunned)
             movement();
-        else if (stunTimer <= combatSettings.stunTime)
-            stunTimer += Time.deltaTime;
-        else {
-            stunTimer = 0.0f;
-            combatSettings.isStunned = false;
-        }
+        else
+            stunRundown();
     }
 
+    //Take input here
     void getInput()
     {
-        //Take movement input here
+        //Take movement inputs from the player
         if(grounded())
             horizontalInput = Input.GetAxisRaw(inputSettings.HORIZONTAL_INPUT);
         else
@@ -138,6 +150,7 @@ public class CharacterController : MonoBehaviour {
         dashInput = Input.GetKeyDown(inputSettings.DASH_INPUT);
     }
 
+    //Move the player vertically and horizontally.
     void movement()
     {
         if (verticalInput > 0 && grounded())
@@ -152,8 +165,10 @@ public class CharacterController : MonoBehaviour {
         //On attack input, instantiate the projectile
         if (attackInput)
         {
+            //Instantiate as Gameobject to alter projectile variables
             GameObject thisProj = Instantiate(combatSettings.projectile, projectilePoint.transform.position, projectilePoint.transform.rotation) as GameObject;
 
+            //Change which way the projectile should move depending on the way that the player iis facing
             if (!facingRight)
                 thisProj.GetComponent<Projectile>().projVars.moveSpeed *= -combatSettings.projectileSpeed;
             else
@@ -169,5 +184,27 @@ public class CharacterController : MonoBehaviour {
     {
         //Return the result of a raycast casting from underneath the object to the layermask specified
         return Physics.Raycast(anchorPoint.transform.position, Vector3.down, distToGround, moveSettings.ground);
+    }
+
+    void stunRundown()
+    {
+        //Increment stun timer until it is greater than stun time, reset timer and allow the player to move.
+        if (stunTimer <= combatSettings.stunTime)
+            stunTimer += Time.deltaTime;
+        else {
+            stunTimer = 0.0f;
+            combatSettings.isStunned = false;
+        }
+    }
+
+    void projectileRundownTimer()
+    {
+        //Increment projectile reset timer until it is greater than stun time, reset timer and allow the player to move.
+        if (projectileResetTimer <= combatSettings.projectileResetTime)
+            projectileResetTimer += Time.deltaTime;
+        else {
+            projectileResetTimer = 0.0f;
+            canAttack = true;
+        }
     }
 }
