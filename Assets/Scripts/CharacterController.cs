@@ -158,6 +158,9 @@ public class CharacterController : MonoBehaviour {
                 thisProj.GetComponent<Projectile>().projVars.moveSpeed *= -combatSettings.projectileSpeed;
             else
                 thisProj.GetComponent<Projectile>().projVars.moveSpeed *= combatSettings.projectileSpeed;
+
+            thisProj.GetComponent<Projectile>().myParent = this.gameObject;
+
             canAttack = false;
         }
     }
