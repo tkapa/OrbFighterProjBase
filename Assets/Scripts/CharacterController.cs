@@ -3,10 +3,10 @@ using System.Collections;
 
 public class CharacterController : MonoBehaviour {
 
-    //Anchorpoint of character
-    public GameObject anchorPoint, 
-        otherPlayer, 
-        projectilePoint;
+    //Various points in the scenes
+    public GameObject anchorPoint;
+    public GameObject otherPlayer; 
+    public GameObject projectilePoint;
 
     //Changeable variables that manage movement
     [System.Serializable]
@@ -49,22 +49,22 @@ public class CharacterController : MonoBehaviour {
 
         //Health and Super Values
         public float maxHealth = 100.0f;
-        public float currHealth;
+        public float currHealth = 100.0f;
 
         public float maxSuper = 100.0f;
-        public float currSuper;
+        public float currSuper = 0.0f;
     }
 
     [System.Serializable]
     public class audioClips
     {
         //Audioclips for *Insert verb here*
-        public AudioClip jumped, 
-            projectiled, 
-            dashed, 
-            damaged, 
-            landed, 
-            super;
+        public AudioClip jumped;
+        public AudioClip projectiled;
+        public AudioClip dashed;
+        public AudioClip damaged;
+        public AudioClip stunned;
+        public AudioClip super;
     }
 
     //Public variable classes initialisation
@@ -74,20 +74,20 @@ public class CharacterController : MonoBehaviour {
     public audioClips audioClip = new audioClips();
 
     //Bools that govern input and action
-    private bool dashInput, 
-        attackInput, 
-        facingRight, 
-        canDash, 
-        canAttack;
+    private bool dashInput = false;
+    private bool attackInput = false;
+    private bool facingRight;
+    private bool canDash = true;
+    private bool canAttack = true;
 
     private float distToGround = 0.1f;
 
     //Timer and input temporary variables
-    private float stunTimer, 
-        dashTimer, 
-        projectileResetTimer, 
-        verticalInput, 
-        horizontalInput;
+    private float stunTimer = 0.0f;
+    private float dashTimer = 0.0f;
+    private float projectileResetTimer = 0.0f;
+    private float verticalInput = 0.0f;
+    private float horizontalInput = 0.0f;
     
     //This object's rigidbody
     Rigidbody rigidBody;
@@ -102,13 +102,6 @@ public class CharacterController : MonoBehaviour {
 
         //Find other player
         otherPlayer = GameObject.FindGameObjectWithTag("Character");
-
-        //Initialise Variables
-        canDash = canAttack = true;
-        dashInput = attackInput = facingRight = false;
-        stunTimer = dashTimer = projectileResetTimer = horizontalInput = verticalInput = 0.0f;
-        combatSettings.currHealth = combatSettings.maxHealth;
-        combatSettings.currSuper = 0.0f;
 	}
 	
 	// Update is called once per frame
@@ -164,8 +157,17 @@ public class CharacterController : MonoBehaviour {
     //Move the player vertically and horizontally.
     void movement()
     {
+        //Play audio and jump if grounded + vertical input
         if (verticalInput > 0 && grounded())
+        {
+            //audioCont.Play(audioClip.jumped);
             rigidBody.AddForce(Vector3.up * moveSettings.jumpVelocity);
+        }
+
+        if(dashInput && canDash)
+        {
+            //audioCont.Play(audioClip.dashed);
+        }
 
         //Move the Object's X position here
         rigidBody.MovePosition(transform.position + (Camera.main.transform.right * (horizontalInput * moveSettings.moveSpeed * Time.deltaTime)));
@@ -185,7 +187,11 @@ public class CharacterController : MonoBehaviour {
             else
                 thisProj.GetComponent<Projectile>().projVars.moveSpeed *= combatSettings.projectileSpeed;
 
+            //Ensure the projectile can't hit this object
             thisProj.GetComponent<Projectile>().myParent = this.gameObject;
+
+            //Play audio clip
+            //audioCont.Play(audioClip.projectiled);
 
             canAttack = false;
         }
