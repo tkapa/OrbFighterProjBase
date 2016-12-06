@@ -5,6 +5,8 @@ public class Projectile : MonoBehaviour {
 
     //Stop the parent of the object from hitting itself
     public GameObject myParent;
+    public Vector3 enemyPos;
+    public Vector3 direction;
 
     [System.Serializable]
     public class ProjectileVariables {
@@ -33,7 +35,7 @@ public class Projectile : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
+        direction = (enemyPos - this.transform.position).normalized;
 	}
 	
 	// Update is called once per frame
@@ -42,9 +44,9 @@ public class Projectile : MonoBehaviour {
     }
 
     void movement()
-    {
+    { 
         //Move the projectile's positiion
-        transform.position += Camera.main.transform.right * projVars.moveSpeed * Time.deltaTime;
+        this.transform.position += direction * projVars.moveSpeed * Time.deltaTime;
     }
 
     void OnTriggerEnter(Collider other)

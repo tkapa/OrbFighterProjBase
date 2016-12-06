@@ -99,27 +99,12 @@ public class CharacterController : MonoBehaviour {
             rigidBody = GetComponent<Rigidbody>();
         else
             Debug.LogError("This object does not contain a RigidBody!");
-
-        //Find other player
-        otherPlayer = GameObject.FindGameObjectWithTag("Character");
 	}
 	
 	// Update is called once per frame
 	void Update () {
         //Retrieve input
         getInput();
-
-        //Determine which way this object should be facing
-        if (otherPlayer.transform.position.x > transform.position.x)
-        {
-            facingRight = true;
-            transform.rotation = Quaternion.Euler(0, 0, 0);
-        }
-        else
-        {
-            facingRight = false;
-            transform.rotation = Quaternion.Euler(0, 180, 0);
-        }
 
         //Update projectile throwing function
         if (canAttack && !combatSettings.isStunned)
@@ -150,15 +135,15 @@ public class CharacterController : MonoBehaviour {
         verticalInput = Input.GetAxisRaw(inputSettings.VERTICAL_INPUT);
 
         //Take combat input here
-        attackInput = Input.GetKeyDown(inputSettings.PROJECTILE_INPUT);
-        dashInput = Input.GetKeyDown(inputSettings.DASH_INPUT);
+        attackInput = Input.GetButtonDown(inputSettings.PROJECTILE_INPUT);
+        dashInput = Input.GetButtonDown(inputSettings.DASH_INPUT);
     }
 
     //Move the player vertically and horizontally.
     void movement()
     {
         //Play audio and jump if grounded + vertical input
-        if (verticalInput > 0 && grounded())
+        if (verticalInput > 0.5f && grounded())
         {
             //audioCont.Play(audioClip.jumped);
             rigidBody.AddForce(Vector3.up * moveSettings.jumpVelocity);
@@ -181,14 +166,9 @@ public class CharacterController : MonoBehaviour {
             //Instantiate as Gameobject to alter projectile variables
             GameObject thisProj = Instantiate(combatSettings.projectile, projectilePoint.transform.position, projectilePoint.transform.rotation) as GameObject;
 
-            //Change which way the projectile should move depending on the way that the player iis facing
-            if (!facingRight)
-                thisProj.GetComponent<Projectile>().projVars.moveSpeed *= -combatSettings.projectileSpeed;
-            else
-                thisProj.GetComponent<Projectile>().projVars.moveSpeed *= combatSettings.projectileSpeed;
-
             //Ensure the projectile can't hit this object
             thisProj.GetComponent<Projectile>().myParent = this.gameObject;
+            thisProj.GetComponent<Projectile>().enemyPos = otherPlayer.transform.position;
 
             //Play audio clip
             //audioCont.Play(audioClip.projectiled);
