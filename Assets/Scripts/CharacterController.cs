@@ -196,6 +196,7 @@ public class CharacterController : MonoBehaviour {
         return Physics.Raycast(anchorPoint.transform.position, Vector3.down, distToGround, moveSettings.ground);
     }
 
+    //Al timers for bool resets
     void stunRundown()
     {
         //Increment stun timer until it is greater than stun time, reset timer and allow the player to move.
@@ -230,6 +231,7 @@ public class CharacterController : MonoBehaviour {
         }
     }
 
+    //Take away health equal to the parameter given
     void takeDamage(float damage)
     {
         combatSettings.currHealth -= damage;
@@ -237,12 +239,11 @@ public class CharacterController : MonoBehaviour {
 
     void OnCollisionEnter(Collision other)
     {
+        //On collision with another player, if the other player is dashing, take damage from them
         if(other.gameObject.tag == "Character")
         {
             if (other.gameObject.GetComponent<CharacterController>().isDashing)
                 takeDamage(other.gameObject.GetComponent<CharacterController>().combatSettings.myDamage);
-            else if (isDashing)
-                other.gameObject.GetComponent<CharacterController>().takeDamage(combatSettings.myDamage);
         }
     }
 
