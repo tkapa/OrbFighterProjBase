@@ -111,16 +111,17 @@ public class CharacterController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         //Retrieve input
-        getInput();
+        GetInput();
 
         //Update projectile throwing function
         if (canAttack && !combatSettings.isStunned)
-            throwProjectile();
+            ThrowProjectile();
         else
-            projectileRundownTimer();
+            ProjectileRundownTimer();
 
         if (!canDash && !isDashing)
-            dashRundownTimer();        
+            DashRundownTimer();
+
     }
 
     void FixedUpdate()
@@ -128,13 +129,13 @@ public class CharacterController : MonoBehaviour {
         //Execute movement based on input
         //If player is not stunned, allow movement otherwise, increment timer and reset the variables
         if (!combatSettings.isStunned)
-            movement();
+            Movement();
         else
-            stunRundown();
+            StunRundown();
     }
 
     //Take input here
-    void getInput()
+    void GetInput()
     {
         //Take movement inputs from the player
         if(grounded())
@@ -150,10 +151,10 @@ public class CharacterController : MonoBehaviour {
     }
 
     //Move the player vertically and horizontally.
-    void movement()
+    void Movement()
     {
         //Play audio and jump if grounded + vertical input
-        if (verticalInput > 0.5f && grounded())
+        if (verticalInput > 0.5f && Grounded())
         {
             //audioCont.Play(audioClip.jumped);
             rigidBody.AddForce(Vector3.up * moveSettings.jumpVelocity);
@@ -171,7 +172,7 @@ public class CharacterController : MonoBehaviour {
         rigidBody.MovePosition(transform.position + (Camera.main.transform.right * (horizontalInput * moveSettings.moveSpeed * Time.deltaTime)));
     }
 
-    void throwProjectile()
+    void ThrowProjectile()
     {
         //On attack input, instantiate the projectile
         if (attackInput)
@@ -191,14 +192,14 @@ public class CharacterController : MonoBehaviour {
     }
 
     //Check that the object is close to the ground
-    bool grounded()
+    bool Grounded()
     {
         //Return the result of a raycast casting from underneath the object to the layermask specified
         return Physics.Raycast(anchorPoint.transform.position, Vector3.down, distToGround, moveSettings.ground);
     }
 
     //All timers for bool resets
-    void stunRundown()
+    void StunRundown()
     {
         //Increment stun timer until it is greater than stun time, reset timer and allow the player to move.
         if (stunTimer <= combatSettings.stunTime)
@@ -209,7 +210,7 @@ public class CharacterController : MonoBehaviour {
         }
     }
 
-    void projectileRundownTimer()
+    void ProjectileRundownTimer()
     {
         //Increment projectile reset timer until it is greater than stun time, reset timer and allow the player to throw another projectile
         if (projectileResetTimer <= combatSettings.projectileResetTime)
@@ -220,7 +221,7 @@ public class CharacterController : MonoBehaviour {
         }
     }
 
-    void dashRundownTimer()
+    void DashRundownTimer()
     {
         //Increment dash reset timer until it is greater than dash time, reset timer and allow the player to dash.
         if (dashTimer <= combatSettings.dashTime)
@@ -233,7 +234,7 @@ public class CharacterController : MonoBehaviour {
     }
 
     //Take away health equal to the parameter given
-    void takeDamage(float damage)
+    void TakeDamage(float damage)
     {
         combatSettings.currHealth -= damage;
     }
@@ -244,7 +245,7 @@ public class CharacterController : MonoBehaviour {
         if(other.gameObject.tag == "Character")
         {
             if (other.gameObject.GetComponent<CharacterController>().isDashing)
-                takeDamage(other.gameObject.GetComponent<CharacterController>().combatSettings.myDamage);
+                TakeDamage(other.gameObject.GetComponent<CharacterController>().combatSettings.myDamage);
         }
     }
 

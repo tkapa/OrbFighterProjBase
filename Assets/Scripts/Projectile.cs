@@ -40,10 +40,10 @@ public class Projectile : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-        movement();
+        Movement();
     }
 
-    void movement()
+    void Movement()
     { 
         //Move the projectile's positiion
         this.transform.position += direction * projVars.moveSpeed * Time.deltaTime;

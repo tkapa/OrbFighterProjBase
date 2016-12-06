@@ -29,7 +29,7 @@ public class GameController : MonoBehaviour {
 	void Start () {
         //Set character length spawn the players, and set their other player variables
         charactersInGame = new GameObject[2];
-        spawnPlayers();
+        SpawnPlayers();
         charactersInGame[0].GetComponent<CharacterController>().otherPlayer = charactersInGame[1];
         charactersInGame[1].GetComponent<CharacterController>().otherPlayer = charactersInGame[0];
     }
@@ -37,11 +37,11 @@ public class GameController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         //Perform player bar updates and timer rundown.
-        playerBarUpdate();
-        timer();
+        PlayerBarUpdate();
+        Timer();
     }
 
-    void spawnPlayers()
+    void SpawnPlayers()
     {
         for (int spawns = 0; spawns < spawnPoints.Length; spawns++)
         {
@@ -79,7 +79,7 @@ public class GameController : MonoBehaviour {
         }
     }
 
-    void playerBarUpdate()
+    void PlayerBarUpdate()
     {
         //Set player one super and hp bar values
         uiElements.playerOneHPBar.value = charactersInGame[0].GetComponent<CharacterController>().combatSettings.currHealth;
@@ -90,7 +90,7 @@ public class GameController : MonoBehaviour {
         uiElements.playerTwoSuperBar.value = charactersInGame[1].GetComponent<CharacterController>().combatSettings.currSuper;
     }
 
-    void timer()
+    void Timer()
     {
         //Countdown the timer until 0
         if (maximumGameTime > 0)
