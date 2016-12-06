@@ -35,7 +35,7 @@ public class Projectile : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        direction = (enemyPos - this.transform.position).normalized;
+        direction = (enemyPos - this.transform.position);
 	}
 	
 	// Update is called once per frame
