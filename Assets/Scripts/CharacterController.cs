@@ -99,6 +99,9 @@ public class CharacterController : MonoBehaviour {
             rigidBody = GetComponent<Rigidbody>();
         else
             Debug.LogError("This object does not contain a RigidBody!");
+
+        combatSettings.currHealth = combatSettings.maxHealth;
+        combatSettings.currSuper = 0.0f;
 	}
 	
 	// Update is called once per frame
