@@ -17,6 +17,8 @@ public class CharacterController : MonoBehaviour {
         public float gravity = 9.8f;
         public float jumpVelocity = 10.0f;
         public float dashSpeed = 1.0f;
+        public float dashDist = 5.0f;
+        public AnimationCurve dashAniCurve;
         public LayerMask ground;
     }
 
@@ -38,6 +40,7 @@ public class CharacterController : MonoBehaviour {
         //Character stun variables
         public bool isStunned = false;
         public float stunTime = 0.75f;
+        public float myDamage = 10.0f;
 
         //Character Projectile times
         public GameObject projectile;
@@ -79,6 +82,7 @@ public class CharacterController : MonoBehaviour {
     private bool facingRight;
     private bool canDash = true;
     private bool canAttack = true;
+    private bool isDashing = false;
 
     private float distToGround = 0.1f;
 
@@ -114,6 +118,9 @@ public class CharacterController : MonoBehaviour {
             throwProjectile();
         else
             projectileRundownTimer();
+
+        if (!canDash && !isDashing)
+            dashRundownTimer();        
     }
 
     void FixedUpdate()
@@ -154,6 +161,9 @@ public class CharacterController : MonoBehaviour {
 
         if(dashInput && canDash)
         {
+            isDashing = true;
+            Vector3 dashDir = (new Vector3(transform.position.x + horizontalInput, transform.position.y + verticalInput, transform.position.z) - transform.position); 
+            StartCoroutine("dash",dashDir);
             //audioCont.Play(audioClip.dashed);
         }
 
@@ -199,12 +209,57 @@ public class CharacterController : MonoBehaviour {
 
     void projectileRundownTimer()
     {
-        //Increment projectile reset timer until it is greater than stun time, reset timer and allow the player to move.
+        //Increment projectile reset timer until it is greater than stun time, reset timer and allow the player to throw another projectile
         if (projectileResetTimer <= combatSettings.projectileResetTime)
             projectileResetTimer += Time.deltaTime;
         else {
             projectileResetTimer = 0.0f;
             canAttack = true;
         }
+    }
+
+    void dashRundownTimer()
+    {
+        //Increment dash reset timer until it is greater than dash time, reset timer and allow the player to dash.
+        if (dashTimer <= combatSettings.dashTime)
+            dashTimer += Time.deltaTime;
+        else
+        {
+            dashTimer = 0.0f;
+            canDash = true;
+        }
+    }
+
+    void takeDamage(float damage)
+    {
+        combatSettings.currHealth -= damage;
+    }
+
+    void OnCollisionEnter(Collision other)
+    {
+        if(other.gameObject.tag == "Character")
+        {
+            if (other.gameObject.GetComponent<CharacterController>().isDashing)
+                takeDamage(other.gameObject.GetComponent<CharacterController>().combatSettings.myDamage);
+            else if (isDashing)
+                other.gameObject.GetComponent<CharacterController>().takeDamage(combatSettings.myDamage);
+        }
+    }
+
+    IEnumerator dash(Vector3 direction)
+    {
+        canDash = false;
+        Vector3 startPos = transform.position;
+        Vector3 tarPos = startPos + (direction * moveSettings.dashDist);
+
+        int dashDuration = (int)(moveSettings.dashDist / moveSettings.dashSpeed);
+
+        for (int f = 0; f < dashDuration; f++)
+        {
+            transform.position = Vector3.Lerp(startPos, tarPos, moveSettings.dashAniCurve.Evaluate((float)f / dashDuration));
+            yield return null;
+        }
+
+        isDashing = false;
     }
 }

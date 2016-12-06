@@ -36,6 +36,7 @@ public class GameController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        //Perform player bar updates and timer rundown.
         playerBarUpdate();
         timer();
     }
@@ -50,22 +51,28 @@ public class GameController : MonoBehaviour {
             if (spawns == 0)
             {
                 charactersInGame[spawns] = newPlayer;
+
+                //Set Input axes for each player
                 newPlayer.GetComponent<CharacterController>().inputSettings.HORIZONTAL_INPUT = "gp_P1LSX";
                 newPlayer.GetComponent<CharacterController>().inputSettings.VERTICAL_INPUT = "gp_P1LSY";
                 newPlayer.GetComponent<CharacterController>().inputSettings.DASH_INPUT = "gp_P1A";
                 newPlayer.GetComponent<CharacterController>().inputSettings.PROJECTILE_INPUT = "gp_P1X";
 
+                //Set max values of each bar
                 uiElements.playerOneHPBar.maxValue = charactersInGame[spawns].GetComponent<CharacterController>().combatSettings.maxHealth;
                 uiElements.playerOneSuperBar.maxValue = charactersInGame[spawns].GetComponent<CharacterController>().combatSettings.maxSuper;
             }
             else
             {
                 charactersInGame[spawns] = newPlayer;
+
+                //Set input axes for each player
                 newPlayer.GetComponent<CharacterController>().inputSettings.HORIZONTAL_INPUT = "gp_P2LSX";
                 newPlayer.GetComponent<CharacterController>().inputSettings.VERTICAL_INPUT = "gp_P2LSY";
                 newPlayer.GetComponent<CharacterController>().inputSettings.DASH_INPUT = "gp_P2A";
                 newPlayer.GetComponent<CharacterController>().inputSettings.PROJECTILE_INPUT = "gp_P2X";
 
+                //Set max values of each bar
                 uiElements.playerTwoHPBar.maxValue = charactersInGame[spawns].GetComponent<CharacterController>().combatSettings.maxHealth;
                 uiElements.playerTwoSuperBar.maxValue = charactersInGame[spawns].GetComponent<CharacterController>().combatSettings.maxSuper;
             }
@@ -88,6 +95,8 @@ public class GameController : MonoBehaviour {
         //Countdown the timer until 0
         if (maximumGameTime > 0)
             maximumGameTime -= Time.deltaTime;
+        //else
+            //End Game
 
         uiElements.timerText.text = "" + (int)maximumGameTime;
     }
