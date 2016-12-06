@@ -138,7 +138,7 @@ public class CharacterController : MonoBehaviour {
     void GetInput()
     {
         //Take movement inputs from the player
-        if(grounded())
+        if(Grounded())
             horizontalInput = Input.GetAxisRaw(inputSettings.HORIZONTAL_INPUT);
         else
             horizontalInput = Input.GetAxis(inputSettings.HORIZONTAL_INPUT);
