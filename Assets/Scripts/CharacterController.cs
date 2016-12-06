@@ -190,13 +190,14 @@ public class CharacterController : MonoBehaviour {
         }
     }
 
+    //Check that the object is close to the ground
     bool grounded()
     {
         //Return the result of a raycast casting from underneath the object to the layermask specified
         return Physics.Raycast(anchorPoint.transform.position, Vector3.down, distToGround, moveSettings.ground);
     }
 
-    //Al timers for bool resets
+    //All timers for bool resets
     void stunRundown()
     {
         //Increment stun timer until it is greater than stun time, reset timer and allow the player to move.
