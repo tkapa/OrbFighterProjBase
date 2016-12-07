@@ -1,19 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Projectile : MonoBehaviour {
-
-    //Stop the parent of the object from hitting itself
-    public GameObject myParent;
-    public Vector3 enemyPos;
-    public Vector3 direction;
-
-    [System.Serializable]
-    public class ProjectileVariables {
-        //Set up variables for projectile movement
-        public float moveSpeed = 1.0f;
-    }
-
     [System.Serializable]
     public class stunVariables
     {
@@ -25,16 +12,23 @@ public class Projectile : MonoBehaviour {
 
         public AnimationCurve stunTimeCurve;
     }
+	
+public class Projectile : MonoBehaviour {
+
+    //Stop the parent of the object from hitting itself
+    GameObject myParent;
+	Vector3 enemyPos;
+	float moveSpeed = 1.0f;
+	
+    private Vector3 direction;
 
     private float travelDistance = 0.0f;
     private float alteredStunTime = 0.0f;
     
     public stunVariables stunVars = new stunVariables();
-    public ProjectileVariables projVars = new ProjectileVariables();
-
 
 	// Use this for initialization
-	void Start () {
+	public void StartManual () {
         direction = (enemyPos - this.transform.position);
 	}
 	
@@ -42,11 +36,16 @@ public class Projectile : MonoBehaviour {
 	void FixedUpdate () {
         Movement();
     }
+	
+	public void SetInformation(ProjectileInfoPack infoPacket){
+		myParent = infoPacket.thisObject;
+		enemyPos = infoPacket.enemyObjectPos;		
+	}
 
     void Movement()
     { 
         //Move the projectile's positiion
-        this.transform.position += direction * projVars.moveSpeed * Time.deltaTime;
+        this.transform.position += direction * moveSpeed * Time.deltaTime;
     }
 
     void OnTriggerEnter(Collider other)
@@ -63,9 +62,11 @@ public class Projectile : MonoBehaviour {
             //Find the stun time for the enemy player
             alteredStunTime *= (stunVars.maxStunTime - stunVars.minStunTime) + stunVars.minStunTime;
 
+            var target = other.GetComponent<CharacterController>();
+
             //Change the stun time and stun the player
-            other.GetComponent<CharacterController>().combatSettings.stunTime = alteredStunTime;
-            other.GetComponent<CharacterController>().combatSettings.isStunned = true;
+            target.combatSettings.stunTime = alteredStunTime;
+            target.myState = CharacterController.PlayerStates.psStunned;
 
             //Destroy this object after hit
             Destroy(this.gameObject);

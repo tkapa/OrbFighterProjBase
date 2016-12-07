@@ -1,13 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CharacterController : MonoBehaviour {
-
-    //Various points in the scenes
-    public GameObject anchorPoint;
-    public GameObject otherPlayer; 
-    public GameObject projectilePoint;
-
     //Changeable variables that manage movement
     [System.Serializable]
     public class MoveMentSettings
@@ -69,6 +62,13 @@ public class CharacterController : MonoBehaviour {
         public AudioClip stunned;
         public AudioClip super;
     }
+	
+public class CharacterController : MonoBehaviour {
+
+    //Various points in the scenes
+    public GameObject anchorPoint;
+    public GameObject otherPlayer; 
+    public GameObject projectilePoint;
 
     //Public variable classes initialisation
     public MoveMentSettings moveSettings = new MoveMentSettings();
@@ -79,11 +79,18 @@ public class CharacterController : MonoBehaviour {
     //Bools that govern input and action
     private bool dashInput = false;
     private bool attackInput = false;
-    private bool facingRight;
-    private bool canDash = true;
-    private bool canAttack = true;
-    private bool isDashing = false;
 
+    private bool canAttack = true;
+
+	public enum PlayerStates{
+		psNeutral,
+		psStunned,
+		psDashing,
+		psDashRecovery
+	};
+	
+	public PlayerStates myState;
+	
     private float distToGround = 0.1f;
 
     //Timer and input temporary variables
@@ -104,6 +111,8 @@ public class CharacterController : MonoBehaviour {
         else
             Debug.LogError("This object does not contain a RigidBody!");
 
+		myState = PlayerStates.psNeutral;
+		
         combatSettings.currHealth = combatSettings.maxHealth;
         combatSettings.currSuper = 0.0f;
 	}
@@ -113,14 +122,21 @@ public class CharacterController : MonoBehaviour {
         //Retrieve input
         GetInput();
 
+        switch(myState){
+            case PlayerStates.psStunned:
+                StunRundown();
+            break;
+
+            case PlayerStates.psDashRecovery:
+                DashRundownTimer();
+            break;
+        }
+
         //Update projectile throwing function
         if (canAttack && !combatSettings.isStunned)
             ThrowProjectile();
         else
-            ProjectileRundownTimer();
-
-        if (!canDash && !isDashing)
-            DashRundownTimer();
+            ProjectileRundownTimer();           
 
     }
 
@@ -128,10 +144,8 @@ public class CharacterController : MonoBehaviour {
     {
         //Execute movement based on input
         //If player is not stunned, allow movement otherwise, increment timer and reset the variables
-        if (!combatSettings.isStunned)
+        if(CanMove())
             Movement();
-        else
-            StunRundown();
     }
 
     //Take input here
@@ -160,9 +174,8 @@ public class CharacterController : MonoBehaviour {
             rigidBody.AddForce(Vector3.up * moveSettings.jumpVelocity);
         }
 
-        if(dashInput && canDash)
+        if(dashInput && (myState != PlayerStates.psDashRecovery || myState != PlayerStates.psDashing))
         {
-            isDashing = true;
             Vector3 dashDir = (new Vector3(transform.position.x + horizontalInput, transform.position.y + verticalInput, transform.position.z) - transform.position); 
             StartCoroutine("dash",dashDir);
             //audioCont.Play(audioClip.dashed);
@@ -177,16 +190,16 @@ public class CharacterController : MonoBehaviour {
         //On attack input, instantiate the projectile
         if (attackInput)
         {
+			var infoPack = new ProjectileInfoPack();
+			infoPack.thisObject = this.gameObject;
+			infoPack.enemyObjectPos = otherPlayer.transform.position;
+			infoPack.newSpeed = combatSettings.projectileSpeed;
+			
             //Instantiate as Gameobject to alter projectile variables
             GameObject thisProj = Instantiate(combatSettings.projectile, projectilePoint.transform.position, projectilePoint.transform.rotation) as GameObject;
-
-            //Ensure the projectile can't hit this object
-            thisProj.GetComponent<Projectile>().myParent = this.gameObject;
-            thisProj.GetComponent<Projectile>().enemyPos = otherPlayer.transform.position;
-
-            //Play audio clip
-            //audioCont.Play(audioClip.projectiled);
-
+			thisProj.GetComponent<Projectile>().SetInformation(infoPack);
+			thisProj.GetComponent<Projectile>().StartManual();
+						
             canAttack = false;
         }
     }
@@ -198,6 +211,13 @@ public class CharacterController : MonoBehaviour {
         return Physics.Raycast(anchorPoint.transform.position, Vector3.down, distToGround, moveSettings.ground);
     }
 
+    bool CanMove(){
+        if((myState == PlayerStates.psNeutral) || (myState == PlayerStates.psDashing) || (myState == PlayerStates.psDashRecovery))
+            return true;
+
+            return false;
+    }
+
     //All timers for bool resets
     void StunRundown()
     {
@@ -206,7 +226,7 @@ public class CharacterController : MonoBehaviour {
             stunTimer += Time.deltaTime;
         else {
             stunTimer = 0.0f;
-            combatSettings.isStunned = false;
+            myState = PlayerStates.psNeutral;
         }
     }
 
@@ -229,7 +249,7 @@ public class CharacterController : MonoBehaviour {
         else
         {
             dashTimer = 0.0f;
-            canDash = true;
+            myState = PlayerStates.psNeutral;
         }
     }
 
@@ -244,14 +264,20 @@ public class CharacterController : MonoBehaviour {
         //On collision with another player, if the other player is dashing, take damage from them
         if(other.gameObject.tag == "Character")
         {
-            if (other.gameObject.GetComponent<CharacterController>().isDashing)
+            if (other.gameObject.GetComponent<CharacterController>().myState == CharacterController.PlayerStates.psDashing)
                 TakeDamage(other.gameObject.GetComponent<CharacterController>().combatSettings.myDamage);
         }
     }
 
+    void OnCollisionStay(Collision other){
+        if(myState == CharacterController.PlayerStates.psDashing && other.gameObject != otherPlayer)
+            myState = PlayerStates.psDashRecovery;
+    }
+
     IEnumerator dash(Vector3 direction)
     {
-        canDash = false;
+        myState = PlayerStates.psDashing;
+
         Vector3 startPos = transform.position;
         Vector3 tarPos = startPos + (direction * moveSettings.dashDist);
 
@@ -259,10 +285,15 @@ public class CharacterController : MonoBehaviour {
 
         for (int f = 0; f < dashDuration; f++)
         {
+            if(myState != CharacterController.PlayerStates.psDashing){
+                yield break;
+                myState = PlayerStates.psDashRecovery;
+            }
+
             transform.position = Vector3.Lerp(startPos, tarPos, moveSettings.dashAniCurve.Evaluate((float)f / dashDuration));
             yield return null;
         }
 
-        isDashing = false;
+        myState = PlayerStates.psDashRecovery;
     }
 }
