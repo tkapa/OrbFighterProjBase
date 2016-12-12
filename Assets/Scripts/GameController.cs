@@ -59,7 +59,7 @@ public class GameController : MonoBehaviour {
                 newPlayer.GetComponent<CharacterController>().inputSettings.PROJECTILE_INPUT = "gp_P1X";
 
                 //Set max values of each bar
-                uiElements.playerOneHPBar.maxValue = charactersInGame[spawns].GetComponent<CharacterController>().combatSettings.maxHealth;
+                uiElements.playerOneHPBar.maxValue = charactersInGame[spawns].GetComponent<HealthComponent>().maximumHealth;
                 uiElements.playerOneSuperBar.maxValue = charactersInGame[spawns].GetComponent<CharacterController>().combatSettings.maxSuper;
             }
             else
@@ -73,7 +73,7 @@ public class GameController : MonoBehaviour {
                 newPlayer.GetComponent<CharacterController>().inputSettings.PROJECTILE_INPUT = "gp_P2X";
 
                 //Set max values of each bar
-                uiElements.playerTwoHPBar.maxValue = charactersInGame[spawns].GetComponent<CharacterController>().combatSettings.maxHealth;
+                uiElements.playerTwoHPBar.maxValue = charactersInGame[spawns].GetComponent<HealthComponent>().maximumHealth;
                 uiElements.playerTwoSuperBar.maxValue = charactersInGame[spawns].GetComponent<CharacterController>().combatSettings.maxSuper;
             }
         }
@@ -82,11 +82,11 @@ public class GameController : MonoBehaviour {
     void PlayerBarUpdate()
     {
         //Set player one super and hp bar values
-        uiElements.playerOneHPBar.value = charactersInGame[0].GetComponent<CharacterController>().combatSettings.currHealth;
+        uiElements.playerOneHPBar.value = charactersInGame[0].GetComponent<HealthComponent>().currentHealth;
         uiElements.playerOneSuperBar.value = charactersInGame[0].GetComponent<CharacterController>().combatSettings.currSuper;
 
         //Set player one super and hp bar valuesSet player two super and HP bar values
-        uiElements.playerTwoHPBar.value = charactersInGame[1].GetComponent<CharacterController>().combatSettings.currHealth;
+        uiElements.playerTwoHPBar.value = charactersInGame[1].GetComponent<HealthComponent>().currentHealth;
         uiElements.playerTwoSuperBar.value = charactersInGame[1].GetComponent<CharacterController>().combatSettings.currSuper;
     }
 

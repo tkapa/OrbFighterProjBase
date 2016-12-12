@@ -42,10 +42,6 @@ using System.Collections;
         //Dash Vars
         public float dashResetTime = 0.75f;    
 
-        //Health and Super Values
-        public float maxHealth = 100.0f;
-        public float currHealth = 100.0f;
-
         public float maxSuper = 100.0f;
         public float currSuper = 0.0f;
     }
@@ -100,6 +96,7 @@ public class CharacterController : MonoBehaviour {
     
     //This object's rigidbody
     Rigidbody rigidBody;
+    HealthComponent healthComponent;
 
 	// Use this for initialization
 	void Start () {
@@ -109,9 +106,13 @@ public class CharacterController : MonoBehaviour {
         else
             Debug.LogError("This object does not contain a RigidBody!");
 
-		myState = PlayerStates.psNeutral;
-		
-        combatSettings.currHealth = combatSettings.maxHealth;
+        if (GetComponent<HealthComponent>())
+            healthComponent = GetComponent<HealthComponent>();
+        else
+            Debug.LogError("This object does not contain a HealthComponent!");
+
+        myState = PlayerStates.psNeutral;
+
         combatSettings.currSuper = 0.0f;
 	}
 	
@@ -252,19 +253,13 @@ public class CharacterController : MonoBehaviour {
         }
     }
 
-    //Take away health equal to the parameter given
-    void TakeDamage(float damage)
-    {
-        combatSettings.currHealth -= damage;
-    }
-
     void OnCollisionEnter(Collision other)
     {
         //On collision with another player, if the other player is dashing, take damage from them
         if(other.gameObject.tag == "Character")
         {
             if (other.gameObject.GetComponent<CharacterController>().myState == CharacterController.PlayerStates.psDashing)
-                TakeDamage(other.gameObject.GetComponent<CharacterController>().combatSettings.myDamage);
+                healthComponent.TakeDamage(other.gameObject.GetComponent<CharacterController>().combatSettings.myDamage);
         }
     }
 
