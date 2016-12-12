@@ -7,7 +7,6 @@ using System.Collections;
     {
         //Variables that relate to the movement of a character
         public float moveSpeed = 5.0f;
-        public float gravity = 9.8f;
         public float jumpVelocity = 10.0f;
         public float dashSpeed = 1.0f;
         public float dashDist = 5.0f;
@@ -24,6 +23,7 @@ using System.Collections;
         public string VERTICAL_INPUT = "Vertical";
         public string PROJECTILE_INPUT = "e";
         public string DASH_INPUT = "q";
+        public string SUPER_INPUT = "x";
     }
 
     //Changeable variables that manage combat
@@ -31,7 +31,6 @@ using System.Collections;
     public class CombatSettings
     {
         //Character stun variables
-        public bool isStunned = false;
         public float stunTime = 0.75f;
         public float myDamage = 10.0f;
 
@@ -40,8 +39,8 @@ using System.Collections;
         public float projectileSpeed = 6.0f;
         public float projectileResetTime = 1.0f;
 
-        //Character dashing variables
-        public float dashTime = 0.75f;
+        //Dash Vars
+        public float dashResetTime = 0.75f;    
 
         //Health and Super Values
         public float maxHealth = 100.0f;
@@ -80,13 +79,12 @@ public class CharacterController : MonoBehaviour {
     private bool dashInput = false;
     private bool attackInput = false;
 
-    private bool canAttack = true;
-
 	public enum PlayerStates{
 		psNeutral,
 		psStunned,
 		psDashing,
-		psDashRecovery
+		psDashRecovery,
+        psProjectileRecovery
 	};
 	
 	public PlayerStates myState;
@@ -130,14 +128,15 @@ public class CharacterController : MonoBehaviour {
             case PlayerStates.psDashRecovery:
                 DashRundownTimer();
             break;
+
+            case PlayerStates.psProjectileRecovery:
+                ProjectileRundownTimer();
+            break;
         }
 
         //Update projectile throwing function
-        if (canAttack && !combatSettings.isStunned)
+        if (myState != PlayerStates.psProjectileRecovery && myState != PlayerStates.psStunned)
             ThrowProjectile();
-        else
-            ProjectileRundownTimer();           
-
     }
 
     void FixedUpdate()
@@ -200,7 +199,7 @@ public class CharacterController : MonoBehaviour {
 			thisProj.GetComponent<Projectile>().SetInformation(infoPack);
 			thisProj.GetComponent<Projectile>().StartManual();
 						
-            canAttack = false;
+            myState = PlayerStates.psProjectileRecovery;
         }
     }
 
@@ -237,14 +236,14 @@ public class CharacterController : MonoBehaviour {
             projectileResetTimer += Time.deltaTime;
         else {
             projectileResetTimer = 0.0f;
-            canAttack = true;
+            myState = PlayerStates.psNeutral;
         }
     }
 
     void DashRundownTimer()
     {
         //Increment dash reset timer until it is greater than dash time, reset timer and allow the player to dash.
-        if (dashTimer <= combatSettings.dashTime)
+        if (dashTimer <= combatSettings.dashResetTime)
             dashTimer += Time.deltaTime;
         else
         {
