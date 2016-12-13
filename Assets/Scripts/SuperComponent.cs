@@ -9,6 +9,39 @@ public class SuperComponent : MonoBehaviour {
     
     void Start()
     {
+        EventManager.instance.OnSuperMove.AddListener((GameObject superMoveUser) =>
+        {
+
+        });
+    }
+
+    void YellowSuperMove()
+    {
+
+    }
+
+    void RedSuperMove()
+    {
+
+    }
+
+    void BlueSuperMove()
+    {
+
+    }
+
+    void GreenSuperMove()
+    {
+
+    }
+
+    void PurpleSuperMove()
+    {
+
+    }
+
+    void BlackSuperMove()
+    {
 
     }
 }

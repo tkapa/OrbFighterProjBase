@@ -160,7 +160,7 @@ public class CharacterController : MonoBehaviour {
         verticalInput = Input.GetAxisRaw(inputSettings.VERTICAL_INPUT);
 
         //Take combat input here
-        attackInput = Input.GetKeyDown(inputSettings.PROJECTILE_INPUT);
+        attackInput = Input.GetButtonDown(inputSettings.PROJECTILE_INPUT);
         dashInput = Input.GetButtonDown(inputSettings.DASH_INPUT);
     }
 
@@ -206,9 +206,11 @@ public class CharacterController : MonoBehaviour {
     }
 
     bool CanMove(){
+        //If the player is not in the specified states, allow the player to move
         if((myState == PlayerStates.psNeutral) || (myState == PlayerStates.psDashing) || (myState == PlayerStates.psDashRecovery))
             return true;
 
+        //Else don't allow the player to move
             return false;
     }
 
@@ -258,6 +260,7 @@ public class CharacterController : MonoBehaviour {
     }
 
     void OnCollisionStay(Collision other){
+        //If the player is dashing while in contact with an object that is not the enemy object, enter the psDashRecovery state.
         if(myState == CharacterController.PlayerStates.psDashing && other.gameObject != otherPlayer)
             myState = PlayerStates.psDashRecovery;
     }
