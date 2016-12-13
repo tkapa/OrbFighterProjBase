@@ -21,14 +21,14 @@ public class Projectile : MonoBehaviour {
 	float moveSpeed = 1.0f;
 	
     private Vector3 direction;
-
     private float travelDistance = 0.0f;
     private float alteredStunTime = 0.0f;
     
     public stunVariables stunVars = new stunVariables();
 
-	// Use this for initialization
+	// Use this for delayed initialization
 	public void StartManual () {
+        
         direction = (enemyPos - this.transform.position);
 	}
 	
@@ -38,6 +38,7 @@ public class Projectile : MonoBehaviour {
     }
 	
 	public void SetInformation(ProjectileInfoPack infoPacket){
+        //Take the information provided to this object to alter current null variables
 		myParent = infoPacket.thisObject;
 		enemyPos = infoPacket.enemyObjectPos;		
 	}

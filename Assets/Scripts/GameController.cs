@@ -56,7 +56,7 @@ public class GameController : MonoBehaviour {
                 newPlayer.GetComponent<CharacterController>().inputSettings.HORIZONTAL_INPUT = "gp_P1LSX";
                 newPlayer.GetComponent<CharacterController>().inputSettings.VERTICAL_INPUT = "gp_P1LSY";
                 newPlayer.GetComponent<CharacterController>().inputSettings.DASH_INPUT = "gp_P1A";
-                newPlayer.GetComponent<CharacterController>().inputSettings.PROJECTILE_INPUT = "gp_P1X";
+                newPlayer.GetComponent<CharacterController>().inputSettings.PROJECTILE_INPUT = /*"gp_P1X"*/ "e";
 
                 //Set max values of each bar
                 uiElements.playerOneHPBar.maxValue = charactersInGame[spawns].GetComponent<HealthComponent>().maximumHealth;
@@ -70,7 +70,7 @@ public class GameController : MonoBehaviour {
                 newPlayer.GetComponent<CharacterController>().inputSettings.HORIZONTAL_INPUT = "gp_P2LSX";
                 newPlayer.GetComponent<CharacterController>().inputSettings.VERTICAL_INPUT = "gp_P2LSY";
                 newPlayer.GetComponent<CharacterController>().inputSettings.DASH_INPUT = "gp_P2A";
-                newPlayer.GetComponent<CharacterController>().inputSettings.PROJECTILE_INPUT = "gp_P2X";
+                newPlayer.GetComponent<CharacterController>().inputSettings.PROJECTILE_INPUT = /*"gp_P2X"*/ "q";
 
                 //Set max values of each bar
                 uiElements.playerTwoHPBar.maxValue = charactersInGame[spawns].GetComponent<HealthComponent>().maximumHealth;

@@ -160,7 +160,7 @@ public class CharacterController : MonoBehaviour {
         verticalInput = Input.GetAxisRaw(inputSettings.VERTICAL_INPUT);
 
         //Take combat input here
-        attackInput = Input.GetButtonDown(inputSettings.PROJECTILE_INPUT);
+        attackInput = Input.GetKeyDown(inputSettings.PROJECTILE_INPUT);
         dashInput = Input.GetButtonDown(inputSettings.DASH_INPUT);
     }
 
@@ -194,13 +194,7 @@ public class CharacterController : MonoBehaviour {
 			infoPack.thisObject = this.gameObject;
 			infoPack.enemyObjectPos = otherPlayer.transform.position;
 			infoPack.newSpeed = combatSettings.projectileSpeed;
-			
-            //Instantiate as Gameobject to alter projectile variables
-            GameObject thisProj = Instantiate(combatSettings.projectile, projectilePoint.transform.position, projectilePoint.transform.rotation) as GameObject;
-			thisProj.GetComponent<Projectile>().SetInformation(infoPack);
-			thisProj.GetComponent<Projectile>().StartManual();
-						
-            myState = PlayerStates.psProjectileRecovery;
+            EventManager.instance.OnProjectileCreation.Invoke(infoPack);
         }
     }
 
