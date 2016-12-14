@@ -34,15 +34,14 @@ public class Projectile : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-        Debug.Log("Let'S Move");
+
         Movement();
     }
 	
 	public void SetInformation(ProjectileInfoPack infoPacket){
         //Take the information provided to this object to alter current null variables
-        Debug.Log("Set Info Response");
         myParent = infoPacket.thisObject;
-		enemyPos = infoPacket.enemyObjectPos;
+        enemyPos = infoPacket.enemyObjectPos;
         moveSpeed = infoPacket.newSpeed;	
 	}
 
