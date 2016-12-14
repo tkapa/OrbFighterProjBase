@@ -11,6 +11,11 @@ public class SuperMoveAbility : UnityEvent<GameObject>
     GameObject superMoveUser;
 }
 
+public class SpawnCharacters : UnityEvent<SpawningInformation> {
+    SpawningInformation spawnInformation;
+}
+
+
 public class EventManager : MonoBehaviour {
 
     private static EventManager inst;
@@ -30,6 +35,7 @@ public class EventManager : MonoBehaviour {
 
     public ProjectileCreation OnProjectileCreation = new ProjectileCreation();
     public SuperMoveAbility OnSuperMove = new SuperMoveAbility();
+    public SpawnCharacters OnSpawnCharacter = new SpawnCharacters();
 
     void Awake()
     {

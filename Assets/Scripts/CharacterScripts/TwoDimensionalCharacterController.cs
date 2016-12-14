@@ -58,7 +58,7 @@ using System.Collections;
         public AudioClip super;
     }
 	
-public class CharacterController : MonoBehaviour {
+public class TwoDimensionalCharacterController : MonoBehaviour {
 
     //Various points in the scenes
     public GameObject anchorPoint;
@@ -160,7 +160,7 @@ public class CharacterController : MonoBehaviour {
         verticalInput = Input.GetAxisRaw(inputSettings.VERTICAL_INPUT);
 
         //Take combat input here
-        attackInput = Input.GetButtonDown(inputSettings.PROJECTILE_INPUT);
+        attackInput = Input.GetKeyDown(inputSettings.PROJECTILE_INPUT);
         dashInput = Input.GetButtonDown(inputSettings.DASH_INPUT);
     }
 
@@ -254,14 +254,14 @@ public class CharacterController : MonoBehaviour {
         //On collision with another player, if the other player is dashing, take damage from them
         if(other.gameObject.tag == "Character")
         {
-            if (other.gameObject.GetComponent<CharacterController>().myState == CharacterController.PlayerStates.psDashing)
-                healthComponent.TakeDamage(other.gameObject.GetComponent<CharacterController>().combatSettings.myDamage);
+            if (other.gameObject.GetComponent<TwoDimensionalCharacterController>().myState == TwoDimensionalCharacterController.PlayerStates.psDashing)
+                healthComponent.TakeDamage(other.gameObject.GetComponent<TwoDimensionalCharacterController>().combatSettings.myDamage);
         }
     }
 
     void OnCollisionStay(Collision other){
         //If the player is dashing while in contact with an object that is not the enemy object, enter the psDashRecovery state.
-        if(myState == CharacterController.PlayerStates.psDashing && other.gameObject != otherPlayer)
+        if(myState == TwoDimensionalCharacterController.PlayerStates.psDashing && other.gameObject != otherPlayer)
             myState = PlayerStates.psDashRecovery;
     }
 
@@ -276,9 +276,9 @@ public class CharacterController : MonoBehaviour {
 
         for (int f = 0; f < dashDuration; f++)
         {
-            if(myState != CharacterController.PlayerStates.psDashing){
+            if(myState != TwoDimensionalCharacterController.PlayerStates.psDashing){
                 yield break;
-                myState = PlayerStates.psDashRecovery;
+               // myState = PlayerStates.psDashRecovery;
             }
 
             transform.position = Vector3.Lerp(startPos, tarPos, moveSettings.dashAniCurve.Evaluate((float)f / dashDuration));

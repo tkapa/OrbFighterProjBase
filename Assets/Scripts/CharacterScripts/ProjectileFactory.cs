@@ -16,7 +16,7 @@ public class ProjectileFactory : MonoBehaviour {
                 thisProj.GetComponent<Projectile>().SetInformation(information);
                 thisProj.GetComponent<Projectile>().StartManual();
 
-                GetComponent<CharacterController>().myState = CharacterController.PlayerStates.psProjectileRecovery;
+                GetComponent<TwoDimensionalCharacterController>().myState = TwoDimensionalCharacterController.PlayerStates.psProjectileRecovery;
             }
         });
 	}

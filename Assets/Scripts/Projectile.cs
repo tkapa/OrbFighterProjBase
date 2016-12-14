@@ -63,11 +63,11 @@ public class Projectile : MonoBehaviour {
             //Find the stun time for the enemy player
             alteredStunTime *= (stunVars.maxStunTime - stunVars.minStunTime) + stunVars.minStunTime;
 
-            var target = other.GetComponent<CharacterController>();
+            var target = other.GetComponent<TwoDimensionalCharacterController>();
 
             //Change the stun time and stun the player
             target.combatSettings.stunTime = alteredStunTime;
-            target.myState = CharacterController.PlayerStates.psStunned;
+            target.myState = TwoDimensionalCharacterController.PlayerStates.psStunned;
 
             //Destroy this object after hit
             Destroy(this.gameObject);

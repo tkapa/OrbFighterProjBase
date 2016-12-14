@@ -30,8 +30,8 @@ public class GameController : MonoBehaviour {
         //Set character length spawn the players, and set their other player variables
         charactersInGame = new GameObject[2];
         SpawnPlayers();
-        charactersInGame[0].GetComponent<CharacterController>().otherPlayer = charactersInGame[1];
-        charactersInGame[1].GetComponent<CharacterController>().otherPlayer = charactersInGame[0];
+        charactersInGame[0].GetComponent<TwoDimensionalCharacterController>().otherPlayer = charactersInGame[1];
+        charactersInGame[1].GetComponent<TwoDimensionalCharacterController>().otherPlayer = charactersInGame[0];
     }
 	
 	// Update is called once per frame
@@ -46,35 +46,35 @@ public class GameController : MonoBehaviour {
         for (int spawns = 0; spawns < spawnPoints.Length; spawns++)
         {
             GameObject newPlayer = Instantiate(potentialCharacters[wantedCharacter], spawnPoints[spawns].transform.position, spawnPoints[spawns].transform.rotation) as GameObject;
-
+            TwoDimensionalCharacterController thisChar = newPlayer.GetComponent<TwoDimensionalCharacterController>();
             //If the player is player one, set the axes that it can use and store it for later
             if (spawns == 0)
             {
                 charactersInGame[spawns] = newPlayer;
 
                 //Set Input axes for each player
-                newPlayer.GetComponent<CharacterController>().inputSettings.HORIZONTAL_INPUT = "gp_P1LSX";
-                newPlayer.GetComponent<CharacterController>().inputSettings.VERTICAL_INPUT = "gp_P1LSY";
-                newPlayer.GetComponent<CharacterController>().inputSettings.DASH_INPUT = "gp_P1A";
-                newPlayer.GetComponent<CharacterController>().inputSettings.PROJECTILE_INPUT ="gp_P1X";
+                thisChar.inputSettings.HORIZONTAL_INPUT = "gp_P1LSX";
+                thisChar.inputSettings.VERTICAL_INPUT = "gp_P1LSY";
+                thisChar.inputSettings.DASH_INPUT = "gp_P1A";
+                thisChar.inputSettings.PROJECTILE_INPUT =/*"gp_P1X"*/"q";
 
                 //Set max values of each bar
                 uiElements.playerOneHPBar.maxValue = charactersInGame[spawns].GetComponent<HealthComponent>().maximumHealth;
-                uiElements.playerOneSuperBar.maxValue = charactersInGame[spawns].GetComponent<CharacterController>().combatSettings.maxSuper;
+                uiElements.playerOneSuperBar.maxValue = charactersInGame[spawns].GetComponent<TwoDimensionalCharacterController>().combatSettings.maxSuper;
             }
             else
             {
                 charactersInGame[spawns] = newPlayer;
 
                 //Set input axes for each player
-                newPlayer.GetComponent<CharacterController>().inputSettings.HORIZONTAL_INPUT = "gp_P2LSX";
-                newPlayer.GetComponent<CharacterController>().inputSettings.VERTICAL_INPUT = "gp_P2LSY";
-                newPlayer.GetComponent<CharacterController>().inputSettings.DASH_INPUT = "gp_P2A";
-                newPlayer.GetComponent<CharacterController>().inputSettings.PROJECTILE_INPUT = "gp_P2X";
+                thisChar.inputSettings.HORIZONTAL_INPUT = "gp_P2LSX";
+                thisChar.inputSettings.VERTICAL_INPUT = "gp_P2LSY";
+                thisChar.inputSettings.DASH_INPUT = "gp_P2A";
+                thisChar.inputSettings.PROJECTILE_INPUT = /*"gp_P2X"*/"e";
 
                 //Set max values of each bar
                 uiElements.playerTwoHPBar.maxValue = charactersInGame[spawns].GetComponent<HealthComponent>().maximumHealth;
-                uiElements.playerTwoSuperBar.maxValue = charactersInGame[spawns].GetComponent<CharacterController>().combatSettings.maxSuper;
+                uiElements.playerTwoSuperBar.maxValue = charactersInGame[spawns].GetComponent<TwoDimensionalCharacterController>().combatSettings.maxSuper;
             }
         }
     }
@@ -83,11 +83,11 @@ public class GameController : MonoBehaviour {
     {
         //Set player one super and hp bar values
         uiElements.playerOneHPBar.value = charactersInGame[0].GetComponent<HealthComponent>().currentHealth;
-        uiElements.playerOneSuperBar.value = charactersInGame[0].GetComponent<CharacterController>().combatSettings.currSuper;
+        uiElements.playerOneSuperBar.value = charactersInGame[0].GetComponent<TwoDimensionalCharacterController>().combatSettings.currSuper;
 
         //Set player one super and hp bar valuesSet player two super and HP bar values
         uiElements.playerTwoHPBar.value = charactersInGame[1].GetComponent<HealthComponent>().currentHealth;
-        uiElements.playerTwoSuperBar.value = charactersInGame[1].GetComponent<CharacterController>().combatSettings.currSuper;
+        uiElements.playerTwoSuperBar.value = charactersInGame[1].GetComponent<TwoDimensionalCharacterController>().combatSettings.currSuper;
     }
 
     void Timer()

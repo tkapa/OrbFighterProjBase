@@ -5,9 +5,9 @@ public class SpiralEffect : MonoBehaviour {
     //Variables
     [SerializeField] float
         rotationAmount,
-        trailLifeTime,
-        trailStartWidth,
-        trailEndWidth;
+        trailLifeTime = 0f,
+        trailStartWidth = 0f,
+        trailEndWidth = 0f;
 
 
 	// Use this for initialization
