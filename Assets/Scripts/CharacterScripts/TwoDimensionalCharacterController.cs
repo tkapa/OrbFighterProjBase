@@ -207,7 +207,7 @@ public class TwoDimensionalCharacterController : MonoBehaviour {
 
     bool CanMove(){
         //If the player is not in the specified states, allow the player to move
-        if((myState == PlayerStates.psNeutral) || (myState == PlayerStates.psDashing) || (myState == PlayerStates.psDashRecovery))
+        if(myState != PlayerStates.psStunned)
             return true;
 
         //Else don't allow the player to move

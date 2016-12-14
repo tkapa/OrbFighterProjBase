@@ -14,6 +14,7 @@ public class ProjectileFactory : MonoBehaviour {
             {
                 GameObject thisProj = Instantiate(projectile, transform.position, transform.rotation) as GameObject;
                 thisProj.GetComponent<Projectile>().SetInformation(information);
+                Debug.Log("Call Set Info");
                 thisProj.GetComponent<Projectile>().StartManual();
 
                 GetComponent<TwoDimensionalCharacterController>().myState = TwoDimensionalCharacterController.PlayerStates.psProjectileRecovery;

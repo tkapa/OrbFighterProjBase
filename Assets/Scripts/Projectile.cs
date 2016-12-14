@@ -28,19 +28,22 @@ public class Projectile : MonoBehaviour {
 
 	// Use this for delayed initialization
 	public void StartManual () {
-        
+        Debug.Log("Go");
         direction = (enemyPos - this.transform.position);
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+        Debug.Log("Let'S Move");
         Movement();
     }
 	
 	public void SetInformation(ProjectileInfoPack infoPacket){
         //Take the information provided to this object to alter current null variables
-		myParent = infoPacket.thisObject;
-		enemyPos = infoPacket.enemyObjectPos;		
+        Debug.Log("Set Info Response");
+        myParent = infoPacket.thisObject;
+		enemyPos = infoPacket.enemyObjectPos;
+        moveSpeed = infoPacket.newSpeed;	
 	}
 
     void Movement()
@@ -54,6 +57,7 @@ public class Projectile : MonoBehaviour {
         //Of the collider's tag is character, and it isn't the spawner, stun the player
         if (other.tag == "Character" && other.gameObject != myParent)
         {
+
             //Find the distance percentage of the projectile from the parent. Make it a % of the min - max distance.
             travelDistance = (Vector3.Distance(myParent.transform.position, this.gameObject.transform.position) - stunVars.minDistance) / stunVars.maxDistance;
 
